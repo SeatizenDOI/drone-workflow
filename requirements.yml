@@ -1,0 +1,22 @@
+name: drone_workflow_env
+channels:
+  - defaults
+dependencies:
+  - python=3.12.7
+  - pip=24.2
+  - pip:
+      - beautifulsoup4
+      - exifread
+      - folium
+      - geopandas
+      - matplotlib
+      - pandas>1.3.0
+      - pdfkit
+      - pillow
+      - pycountry
+      - rasterio
+      - requests
+      - rpy2
+      - xmltodict
+      - webdriver-manager 
+      - wkhtmltopdf
