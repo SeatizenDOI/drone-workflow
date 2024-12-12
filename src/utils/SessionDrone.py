@@ -2,12 +2,12 @@ import shutil
 import pandas as pd
 import geopandas as gpd
 from pathlib import Path
-from argparse import Namespace
 from shapely import Polygon
+from argparse import Namespace
 
-from ..DroneMD.exif_helper import images_coords, bbox, center_bbox, datebe, altimg, common_tags
 from ..DroneMD.meteo_helper import meteo
 from ..DroneMD.report import define_map, map_html, convert_map_pdf
+from ..DroneMD.exif_helper import images_coords, bbox, center_bbox, datebe, altimg, common_tags
 
 class SessionDrone:
     def __init__(self, session: Path):
@@ -22,7 +22,7 @@ class SessionDrone:
         self.METADATA_FOLDER = Path(session, "METADATA")
 
         self.metadata_df = pd.DataFrame()
-        self.gdf, self.gdfutm = gpd.GeoDataFrame(), gpd.GeoDataFrame()
+        self.metadata_gdf, self.gdfutm = gpd.GeoDataFrame(), gpd.GeoDataFrame()
         self.img_list = []
         self.survey_area = 0
 
@@ -91,8 +91,8 @@ class SessionDrone:
         self.metadata_df = images_coords(self.get_img_list())
         self.metadata_df["relative_file_path"] = self.metadata_df.apply(lambda row: f"{self.session.name}/DCIM/{row['FileName']}", axis=1)
 
-        self.gdf = gpd.GeoDataFrame(self.metadata_df, geometry = gpd.points_from_xy(self.metadata_df['GPSLongitude'], self.metadata_df['GPSLatitude']), crs = 'EPSG:4326')
-        self.gdfutm = self.gdf.to_crs(self.gdf.estimate_utm_crs())
+        self.metadata_gdf = gpd.GeoDataFrame(self.metadata_df, geometry = gpd.points_from_xy(self.metadata_df['GPSLongitude'], self.metadata_df['GPSLatitude']), crs = 'EPSG:4326')
+        self.gdfutm = self.metadata_gdf.to_crs(self.metadata_gdf.estimate_utm_crs())
         geom_mdt = "SurveyMetadata.gpkg"
 
         print("func: Compute convex hull")
@@ -107,7 +107,7 @@ class SessionDrone:
         self.gdfutm.to_file(Path(self.GPS_DEVICE_FOLDER, geom_mdt), layer="images", driver='GPKG')
 
         print("func: Exporting metadata.csv !")
-        self.gdf.to_csv(Path(self.METADATA_FOLDER, "metadata.csv"), quoting=1, quotechar='"', index=False)
+        self.metadata_gdf.to_csv(Path(self.METADATA_FOLDER, "metadata.csv"), quoting=1, quotechar='"', index=False)
 
 
     def generate_pdf_and_html_report(self) -> None:
@@ -141,10 +141,10 @@ class SessionDrone:
                                                         )
 
         print("func: Generate map")
-        map = define_map(self.gdf, self.session, self.title, nb_images, str(round(alt)), self.survey_area, start, end)
+        map = define_map(self.metadata_gdf, self.session, self.title, nb_images, str(round(alt)), self.survey_area, start, end)
         
         print("func: Generate html")
-        map_to_html = map_html(map, survey_info, self.gdf)
+        map_to_html = map_html(map, survey_info, self.metadata_gdf)
         
         print("func: Save html to disk")
         html_file= Path(self.METADATA_FOLDER,"Report_" + start.replace(":","-").replace(" ", "_") + "_" + str(nb_images) + "-JPEGs.html")
@@ -153,3 +153,19 @@ class SessionDrone:
 
         print("func: Convert html to pdf")
         convert_map_pdf(html_file)
+    
+    def get_spatial_coverage(self) -> str:
+        pol = Polygon(self.metadata_gdf.geometry.to_list()).convex_hull
+        srid = int(str(self.metadata_gdf.crs.srs).split(":")[1])
+        return f"srid:{srid}"
+        return f"srid:{srid};{pol}"
+    
+    def get_temporal_coverage(self) -> str:
+
+        begin, end = datebe(self.metadata_df)
+        begin_d, begin_h = begin.split(' ')
+        end_d, end_h = end.split(' ')
+        begin_d = begin_d.replace(':', '-')
+        end_d = end_d.replace(':', '-')
+
+        return f"{begin_d}T{begin_h}Z/{end_d}T{end_h}Z"

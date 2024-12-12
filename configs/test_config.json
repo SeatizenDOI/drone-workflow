@@ -1,0 +1,24 @@
+{
+    "description": {
+        "abstract": "test",
+        "purpose": "test",
+        "credit": "test",
+        "info": "test",
+        "edition": "test",
+        "status": "test"
+    },
+
+    "creator": {
+        "owner": "villien@ifemer.fr"
+    },
+
+    "type":"generic:dataset",
+
+    "relation": "parent:seatizenatlas@https://doi.org/10.5281/zenodo.11125847" ,
+
+    "rights": {
+        "license": "cc-by-4.0",
+        "useLimitation": "Free usage",
+        "otherConstraint": "The supplier is unable to guarantee the accuracy, updating, integrity, completeness of the data"
+    }
+}
