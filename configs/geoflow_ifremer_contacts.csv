@@ -1,2 +1,15 @@
 Identifier,Email,OrganizationName,PositionName,LastName,FirstName,PostalAddress,PostalCode,City,Country,Voice,Facsimile,WebsiteUrl,WebsiteName
-id:villien@ifemer.fr,villien@ifemer.fr,Institut de recherche pour le développement (IRD),Research public body,,,"Le Sextant, 44, bd de Dunkerque, CS 90009",13572,Marseille cedex 02,France,33 (0)4 91 99 92 00,33 (0)4 91 99 92 22,http://www.ird.fr/,Website
+"id:alexis.joly@inria.fr_
+orcid:0000-0002-2161-9940",alexis.joly@inria.fr,"INRIA Zenith, Montpellier, France",,Joly,Alexis,,,,France,,,,
+"id:julien.barde@ird.fr_
+orcid:0000-0002-3519-6141",julien.barde@ird.fr,"UMR Marbec, IRD, France",,Barde,Julien,,,,France,,,,
+"id:Matteo.Contini@ifremer.fr_
+orcid:0009-0007-8665-6201",Matteo.Contini@ifremer.fr,"Ifremer DOI, La Réunion, France",,Contini,Matteo,,,,France,,,,
+"id:serge.bernard@cnrs.fr_
+orcid:0000-0003-1772-0592",serge.bernard@cnrs.fr,"Ifremer DOI, La Réunion, France",,Serge,Bernard,,,,France,,,,
+"id:Sylvain.Bonhommeau@ifremer.fr_
+orcid:0000-0002-0882-5918",Sylvain.Bonhommeau@ifremer.fr,"Ifremer DOI, La Réunion, France",,Sylvain,Bonhommeau,,,,France,,,,
+"id:sylvain.poulain@giscan.com_
+orcid:0009-0005-9789-9095",sylvain.poulain@giscan.com,"UMR Marbec, IRD, La Réunion, France",,Sylvain,Poulain,,,,France,,,,
+"id:villien@ifremer.fr_
+orcid:0009-0007-2143-8027",villien@ifremer.fr,"Ifremer DOI, La Réunion, France",,Victor,Illien,,,,France,,,,

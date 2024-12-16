@@ -47,7 +47,7 @@ class SessionDrone:
 
         self.title = f"Aerial images collected by {self.platform}, {self.place}, {self.alpha3code} - {self.date} - {session_number}"
 
-    def generate_metadata(self, opt: Namespace):
+    def generate_metadata(self, opt: Namespace) -> None:
         """ Main function to generate metadata. """
 
         # Prepare folder.
@@ -154,14 +154,17 @@ class SessionDrone:
         print("func: Convert html to pdf")
         convert_map_pdf(html_file)
     
+
     def get_spatial_coverage(self) -> str:
+        """ Return spatial coverage in geoflow format."""
         pol = Polygon(self.metadata_gdf.geometry.to_list()).convex_hull
         srid = int(str(self.metadata_gdf.crs.srs).split(":")[1])
-        return f"srid:{srid}"
-        return f"srid:{srid};{pol}"
+        # return f"srid:{srid}"
+        return f"SRID={srid};{pol}"
     
-    def get_temporal_coverage(self) -> str:
 
+    def get_temporal_coverage(self) -> str:
+        """ Return temporal coverga in geoflow format."""
         begin, end = datebe(self.metadata_df)
         begin_d, begin_h = begin.split(' ')
         end_d, end_h = end.split(' ')

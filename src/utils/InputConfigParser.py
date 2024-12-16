@@ -16,39 +16,44 @@ class InputConfigParser:
         if not path.exists():
             raise NameError(f"Input config file not found at path {path}")
         
-        jsd = {}
+        json_content = {}
         with open(path, "r") as file:
-            jsd = json.load(file)
+            json_content = json.load(file)
 
-        return jsd
+        return json_content
+
+
+    def parse_head_key(self, big_key_name: str) -> str:
+        """ From config file parse subkey """
+        content = ""
+        for key in self.input_config[big_key_name]:
+            if self.input_config[big_key_name][key] == "": continue
+            content += f"{key}:'{self.input_config[big_key_name][key]}'_\n"
+        return content.strip("_\n")
 
 
     def get_description(self) -> str:
-        a = self.input_config['description']['abstract']
-        p = self.input_config['description']['purpose']
-        c = self.input_config['description']['credit']
-        i = self.input_config['description']['info']
-        e = self.input_config['description']['edition']
-        s = self.input_config['description']['status']
+        description = self.parse_head_key("description")
+        if description == "":
+            raise NameError("Description is mandatory please fill at least abstract in config file.")
+        return description
 
-        return f"abstract:'{a}'_\npurpose:'{p}'_\ncredit:'{c}'_\ninfo:'{i}'_\nedition:'{e}'_\nstatus:'{s}'"
 
     def get_relation(self) -> str:
         return self.input_config['relation']
 
+
     def get_type(self) -> str:
         return self.input_config['type']
     
+
     def get_subject(self) -> str:
         return self.input_config['subject']
-    
+
+
     def get_creator(self) -> str:
-        return f"owner:'{self.input_config['creator']['owner']}'"
+        return self.parse_head_key("creator")
+
 
     def get_rights(self) -> str:
-
-        l = self.input_config['rights']['license']
-        u = self.input_config['rights']['useLimitation']
-        o = self.input_config['rights']['otherConstraint']
-
-        return f"license:'{l}'_\nuseLimitation:'{u}'_\notherConstraint:'{o}'"
+        return self.parse_head_key("rights")

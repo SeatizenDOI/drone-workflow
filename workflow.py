@@ -27,7 +27,7 @@ def parse_args() -> Namespace:
     
     # Geoflow arguments.
     ap.add_argument("-og", "--only_geoflow", action="store_true", help="Run only geoflow pipeline. If no ISO 19115 config file generated, nothing happen")
-    ap.add_argument("-pgl", "--path_geoflow_library", default="/home/bioeos/R/x86_64-pc-linux-gnu-library/4.4/", help="Path to R library where geoflow package is")
+    ap.add_argument("-pgl", "--path_geoflow_library", default="/usr/local/lib/R/site-library/", help="Path to R library where geoflow package is. Default is path in docker image")
     ap.add_argument("-icfg", "--input_config_file_geoflow", default="./configs/test_config.json", help="Static value to put in geoflow workflow")
     ap.add_argument("-pog", "--path_output_geoflow", default="./output", help="Where to store geoflow output and ISO 19115 config file")
 
@@ -50,12 +50,9 @@ def main(opt: Namespace) -> None:
     metadata_geoflow = GlobalMetadataGeoflow(
         folder_to_save=opt.path_output_geoflow, 
         input_config_file_path=opt.input_config_file_geoflow, 
-        session_parent_folder=str(sessions[0].parent) if len(sessions) > 0 else "",
+        first_session=sessions[0],
         need_clean=opt.clean
     )
-
-
-
 
     if not opt.only_geoflow:
         # Iter on each session to setup 

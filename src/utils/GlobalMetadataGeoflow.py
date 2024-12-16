@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 import shutil
 import pandas as pd
 from pathlib import Path
@@ -10,11 +11,11 @@ from .InputConfigParser import InputConfigParser
 # https://github.com/r-geoflow/geoflow/blob/master/doc/metadata.md
 class GlobalMetadataGeoflow:
     """ Wrapper to setup geoflow and called geoflow pipeline. """
-    def __init__(self, folder_to_save: str, input_config_file_path: str, session_parent_folder: str, need_clean: bool):
+    def __init__(self, folder_to_save: str, input_config_file_path: str, first_session: Path, need_clean: bool):
 
         self.input_config_manager = InputConfigParser(input_config_file_path)
-        self.session_parent_folder = session_parent_folder
-        self.folder_to_save = Path(folder_to_save, session_parent_folder.replace("/", "_").replace("\\", "_").strip("_"))
+        self.session_parent_folder = first_session.parent
+        self.folder_to_save = Path(folder_to_save, first_session.name) # Save all xml under first session name to avoid multiple erase on folder save (datarmor)
         if self.folder_to_save.exists() and need_clean:
             shutil.rmtree(self.folder_to_save)
         self.folder_to_save.mkdir(parents=True, exist_ok=True) 
@@ -64,8 +65,8 @@ class GlobalMetadataGeoflow:
             "Identifier": f"id:{session.session.name}",
             "Title": f"title:{session.title}",
             "Description": self.input_config_manager.get_description(),
-            "Subject": "discipline:'aled'",
-            "Date": "publication:2021-03-22",
+            "Subject": "discipline:'UAV'",
+            "Date": f"creation:{datetime.now().strftime('%Y-%m-%d')}",
             "Creator": self.input_config_manager.get_creator(),
             "Type": self.input_config_manager.get_type(),
             "Language": "eng",
@@ -74,8 +75,8 @@ class GlobalMetadataGeoflow:
             "Format": "resource:text/csv",
             "Relation": self.input_config_manager.get_relation(),
             "Rights": self.input_config_manager.get_rights(),
-            "Provenance": "statement:My data management workflow", 
-            "Data": "source:README.md@https://raw.githubusercontent.com/eblondel/zen4R/master/README.md"
+            "Provenance": "statement:Drone Workflow for Seatizen project", 
+            "Data": "source:README.md@https://raw.githubusercontent.com/SeatizenDOI/drone-workflow/refs/heads/master/README.md"
         })
 
 

@@ -25,24 +25,38 @@
 * [Docker](./docker.README.md)
 * [Installation](#installation)
 * [Usage](#usage)
+* [ISO](#iso-19115-metadata)
+* [Datarmor](#datarmor)
 * [Contributing](#contributing)
 * [License](#license)
 
 
 ## Installation
 
-To ensure a consistent environment for all users, this project uses a Conda environment defined in a `inference_env.yml` file. Follow these steps to set up your environment:
+To ensure a consistent environment for all users, this project uses a Conda environment defined in a `requirements.yml` file. Follow these steps to set up your environment:
 
-I wish you good luck for the installation.
+I wish you good luck for the installation. You will need gdal...
 
-1. **Install Conda:** If you do not have Conda installed, download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution).
+1. **Install R (test on ubuntu 24.04):** You need to install R and some packages to run with R wrapper and Python wrapper.
+    ```bash
+    sudo apt-get update
+    sudo apt-get install r-base r-base-dev
+    sudo apt-get install libsodium-dev libsecret-1-dev wkhtmltopdf libssl-dev libcurl4-openssl-dev libxml2-dev libudunits2-dev
+   ```
 
-2. **Create the Conda Environment:** Navigate to the root of the project directory and run the following command to create a new environment from the `requirements.yml` file:
+2. **Run this command in your terminal to install geoflow:** See this [page](https://github.com/r-geoflow/geoflow/wiki#install_guide) to stay up-to-date
+    ```bash
+    R -e "install.packages('remotes') | require('remotes') | install_github('eblondel/geoflow', dependencies = c('Depends', 'Imports'), force=TRUE)"
+    ```
+
+3. **Install Conda:** If you do not have Conda installed, download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution).
+
+4. **Create the Conda Environment:** Navigate to the root of the project directory and run the following command to create a new environment from the `requirements.yml` file:
    ```bash
    conda env create -f requirements.yml
    ```
 
-3. **Activate the Environment:** Once the environment is created, activate it using:
+5. **Activate the Environment:** Once the environment is created, activate it using:
    ```bash
    conda activate drone_workflow_env
    ```
@@ -73,6 +87,53 @@ You can specify the paths to the files or folders to be used as input:
 * `-pcsv`, `--path_csv_file`: Path to the CSV file containing the inputs. Default: ./csv_inputs/retry.csv.
 
 
+## ISO 19115 metadata
+
+Useful link, to update the code or the configuration file :
+
+- Métadonnées : https://github.com/r-geoflow/geoflow/blob/master/doc/metadata.md
+- Contacts : https://github.com/r-geoflow/geoflow/blob/master/doc/metadata_contacts.md
+- Config : https://github.com/r-geoflow/geoflow/blob/master/inst/extdata/workflows/config_metadata_gsheets_iso19115.json
+
+## Datarmor
+
+### Build singularity container
+
+`module load singularity/3.6.4`
+
+`singularity build -f drone_workflow.sif docker://seatizendoi/drone-workflow:latest`
+
+### PBS
+
+```bash
+#!/bin/bash
+
+#PBS -l select=1:ncpus=32:mem=40g
+#PBS -l walltime=2:00:00
+#PBS -N drone_workflow
+#PBS -q omp
+#PBS -S /bin/bash
+#PBS -J 1-2
+
+signal_handler() {
+        pkill --parent "${$}"
+}
+trap signal_handler EXIT
+cd /home1/datahome/villien/PBS/drone_workflow/
+
+module load singularity/3.6.4
+
+
+singularity run --pwd /home/seatizen/app/ \
+--bind /home1/datahome/villien/project_hub/drone-workflow/configs:/home/seatizen/app/configs \
+--bind /home1/scratch/villien/output_workflow:/home/seatizen/app/output \
+--bind /home/ifremer-rbe-doi-rummo/drone/drone_serge:/home/seatizen/plancha \
+
+
+drone_upscaling.sif -c -efol -pfol /home/seatizen/plancha -ip $PBS_ARRAY_INDEX
+
+qstat -f $PBS_JOBID
+```
 
 ## Contributing
 
