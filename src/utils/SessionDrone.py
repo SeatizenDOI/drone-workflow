@@ -6,6 +6,7 @@ from shapely import Polygon
 from argparse import Namespace
 
 from ..DroneMD.meteo_helper import meteo
+from ..DroneMD.raster_helper import series_to_img
 from ..DroneMD.report import define_map, map_html, convert_map_pdf
 from ..DroneMD.exif_helper import images_coords, bbox, center_bbox, datebe, altimg, common_tags
 
@@ -108,6 +109,9 @@ class SessionDrone:
 
         print("func: Exporting metadata.csv !")
         self.metadata_gdf.to_csv(Path(self.METADATA_FOLDER, "metadata.csv"), quoting=1, quotechar='"', index=False)
+
+        print("func: Create thumbails pdf")
+        series_to_img(self.get_img_list(), self.session)
 
 
     def generate_pdf_and_html_report(self) -> None:
